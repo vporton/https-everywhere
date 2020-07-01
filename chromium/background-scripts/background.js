@@ -9,7 +9,8 @@ const rules = require('./rules'),
   update = require('./update'),
   { update_channels } = require('./update_channels'),
   wasm = require('./wasm'),
-  ipUtils = require('./ip_utils');
+  ipUtils = require('./ip_utils'),
+  UrlbarProviderTorOnion = require('./urlbarprovidertoronion').UrlbarProviderTorOnion;
 
 
 let all_rules = new rules.RuleSets();
@@ -23,6 +24,7 @@ async function initialize() {
   await update.initialize(store, initializeAllRules);
   await all_rules.loadFromBrowserStorage(store, update.applyStoredRulesets);
   await incognito.onIncognitoDestruction(destroy_caches);
+  initializeAddressBar();
 }
 initialize();
 
@@ -30,6 +32,10 @@ async function initializeAllRules() {
   const r = new rules.RuleSets();
   await r.loadFromBrowserStorage(store, update.applyStoredRulesets);
   Object.assign(all_rules, r);
+}
+
+function initializeAddressBar() {
+  UrlbarProvidersManager.registerProvider(new UrlbarProviderTorOnion());
 }
 
 /**
